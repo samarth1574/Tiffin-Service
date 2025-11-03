@@ -1,0 +1,51 @@
+export const MENU_ITEMS = [
+    {
+        id: '1',
+        day: 'Monday',
+        lunch: 'Paneer Butter Masala, Dal Tadka, Rice, 3 Rotis, Salad',
+        dinner: 'Aloo Gobi, Dal Fry, Rice, 3 Rotis, Pickle',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '2',
+        day: 'Tuesday',
+        lunch: 'Rajma Chawal, Jeera Aloo, 3 Rotis, Raita',
+        dinner: 'Bhindi Masala, Dal Makhani, Rice, 3 Rotis, Salad',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '3',
+        day: 'Wednesday',
+        lunch: 'Chole Bhature, Rice, Salad, Pickle',
+        dinner: 'Mix Veg, Dal Tadka, Rice, 3 Rotis, Sweet',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '4',
+        day: 'Thursday',
+        lunch: 'Kadhi Pakora, Rice, Aloo Jeera, 3 Rotis',
+        dinner: 'Egg Curry / Paneer Curry, Rice, 3 Rotis, Salad',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '5',
+        day: 'Friday',
+        lunch: 'Dal Makhani, Shahi Paneer, Naan, Rice',
+        dinner: 'Soyabean Curry, Dal Fry, Rice, 3 Rotis',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '6',
+        day: 'Saturday',
+        lunch: 'Veg Biryani, Raita, Salad, Papad',
+        dinner: 'Malai Kofta, Naan, Rice, Salad',
+        image: 'https://via.placeholder.com/150',
+    },
+    {
+        id: '7',
+        day: 'Sunday',
+        lunch: 'Special Thali (3 Sabzi, Dal, Rice, Sweet)',
+        dinner: 'Light Khichdi / Dalia, Papad, Pickle',
+        image: 'https://via.placeholder.com/150',
+    },
+];
