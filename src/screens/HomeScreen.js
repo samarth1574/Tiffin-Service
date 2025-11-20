@@ -12,7 +12,7 @@ export const HomeScreen = ({ navigation }) => {
     const todaySpecial = MENU_ITEMS[new Date().getDay()];
 
     const renderItem = ({ item }) => (
-        <FoodCard item={item} showRating={true} />
+        <FoodCard item={item} showRating={true} onPress={() => navigation.navigate('MenuDetail')} />
     );
 
     return (
@@ -74,7 +74,12 @@ export const HomeScreen = ({ navigation }) => {
                 )}
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Weekly Menu</Text>
+                    <View style={styles.sectionHeaderRow}>
+                        <Text style={styles.sectionTitle}>Weekly Menu</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('MenuDetail')}>
+                            <Text style={styles.viewAllText}>View All</Text>
+                        </TouchableOpacity>
+                    </View>
                     <FlatList
                         data={MENU_ITEMS}
                         renderItem={renderItem}

@@ -12,6 +12,7 @@ import { MealPreferenceScreen } from '../screens/MealPreferenceScreen';
 import { CheckoutScreen } from '../screens/CheckoutScreen';
 import { OrderTrackingScreen } from '../screens/OrderTrackingScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { MenuDetailScreen } from '../screens/MenuDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,6 +67,11 @@ export const AppNavigator = () => {
                     name="OrderTracking"
                     component={OrderTrackingScreen}
                     options={{ headerShown: true, title: 'Track Order' }}
+                />
+                <Stack.Screen
+                    name="MenuDetail"
+                    component={MenuDetailScreen}
+                    options={{ headerShown: true, title: 'Menu Details' }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

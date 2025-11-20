@@ -20,7 +20,7 @@ export const MENU_ITEMS = [
         day: 'Wednesday',
         lunch: 'Chole Bhature, Rice, Salad, Pickle',
         dinner: 'Mix Veg, Dal Tadka, Rice, 3 Rotis, Sweet',
-        image: 'https://images.unsplash.com/photo-1626132647523-66f0bf380027?w=800',
+        image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800',
         rating: 4.8,
     },
     {
