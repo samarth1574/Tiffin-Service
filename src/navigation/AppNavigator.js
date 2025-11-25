@@ -13,6 +13,9 @@ import { CheckoutScreen } from '../screens/CheckoutScreen';
 import { OrderTrackingScreen } from '../screens/OrderTrackingScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { MenuDetailScreen } from '../screens/MenuDetailScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
+import { AddressManagementScreen } from '../screens/AddressManagementScreen';
+import { PaymentScreen } from '../screens/PaymentScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -52,6 +55,7 @@ export const AppNavigator = () => {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Splash" component={SplashScreen} />
                 <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Register" component={RegisterScreen} />
                 <Stack.Screen name="Main" component={MainTabNavigator} />
                 <Stack.Screen
                     name="MealPreference"
@@ -72,6 +76,16 @@ export const AppNavigator = () => {
                     name="MenuDetail"
                     component={MenuDetailScreen}
                     options={{ headerShown: true, title: 'Menu Details' }}
+                />
+                <Stack.Screen
+                    name="AddressManagement"
+                    component={AddressManagementScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Payment"
+                    component={PaymentScreen}
+                    options={{ headerShown: false }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

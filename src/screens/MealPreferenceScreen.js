@@ -19,6 +19,13 @@ const MEAL_TYPES = [
         image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400',
         description: 'Delicious non-veg options',
     },
+    {
+        type: 'Both',
+        icon: 'nutrition',
+        color: ['#9C27B0', '#7B1FA2'],
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
+        description: 'Mix of veg & non-veg',
+    },
 ];
 
 const MEAL_TIMES = [
@@ -33,6 +40,12 @@ const MEAL_TIMES = [
         icon: 'moon',
         color: ['#5C6BC0', '#3F51B5'],
         period: '7:00 PM - 9:00 PM',
+    },
+    {
+        time: 'Both',
+        icon: 'time',
+        color: ['#00ACC1', '#0097A7'],
+        period: 'Lunch & Dinner',
     },
 ];
 

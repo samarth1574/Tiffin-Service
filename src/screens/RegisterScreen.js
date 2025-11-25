@@ -1,46 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
-import { useEffect } from 'react';
 
-WebBrowser.maybeCompleteAuthSession();
-
-export const LoginScreen = ({ navigation }) => {
+export const RegisterScreen = ({ navigation }) => {
+    const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const { login } = useApp();
 
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        expoClientId: 'YOUR_EXPO_CLIENT_ID',
-        iosClientId: 'YOUR_IOS_CLIENT_ID',
-        androidClientId: 'YOUR_ANDROID_CLIENT_ID',
-        webClientId: 'YOUR_WEB_CLIENT_ID',
-    });
-
-    useEffect(() => {
-        if (response?.type === 'success') {
-            const { authentication } = response;
-            // Handle successful Google login
-            handleGoogleLogin(authentication);
-        }
-    }, [response]);
-
-    const handleGoogleLogin = async (authentication) => {
-        // In a real app, you would verify the token with your backend
-        // For now, we'll just use dummy data
-        await login('google-user', 'user@gmail.com');
-        navigation.replace('Main');
-    };
-
-    const handleLogin = async () => {
-        if (!phone || !email) {
-            Alert.alert('Error', 'Please enter both phone and email');
+    const handleRegister = async () => {
+        if (!name || !phone || !email || !password) {
+            Alert.alert('Error', 'Please fill all fields');
             return;
         }
+
+        // In a real app, you would register with backend
         await login(phone, email);
         navigation.replace('Main');
     };
@@ -50,20 +27,28 @@ export const LoginScreen = ({ navigation }) => {
             colors={['#FF6B35', '#F7931E']}
             style={styles.container}
         >
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
-            >
+            <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.content}>
                     <View style={styles.logoContainer}>
-                        <Ionicons name="restaurant" size={80} color="#fff" />
+                        <Ionicons name="restaurant" size={60} color="#fff" />
                         <Text style={styles.appName}>HomeTiffin</Text>
-                        <Text style={styles.tagline}>Fresh homemade food, delivered daily</Text>
+                        <Text style={styles.tagline}>Create your account</Text>
                     </View>
 
                     <View style={styles.formContainer}>
-                        <Text style={styles.title}>Welcome Back!</Text>
-                        <Text style={styles.subtitle}>Login to continue</Text>
+                        <Text style={styles.title}>Sign Up</Text>
+                        <Text style={styles.subtitle}>Join us for delicious meals</Text>
+
+                        <View style={styles.inputContainer}>
+                            <Ionicons name="person-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Full Name"
+                                placeholderTextColor="#999"
+                                value={name}
+                                onChangeText={setName}
+                            />
+                        </View>
 
                         <View style={styles.inputContainer}>
                             <Ionicons name="call-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
@@ -90,46 +75,41 @@ export const LoginScreen = ({ navigation }) => {
                             />
                         </View>
 
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                        <View style={styles.inputContainer}>
+                            <Ionicons name="lock-closed-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Password"
+                                placeholderTextColor="#999"
+                                secureTextEntry
+                                value={password}
+                                onChangeText={setPassword}
+                            />
+                        </View>
+
+                        <TouchableOpacity style={styles.button} onPress={handleRegister}>
                             <LinearGradient
                                 colors={['#FF6B35', '#F7931E']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
                                 style={styles.buttonGradient}
                             >
-                                <Text style={styles.buttonText}>Login</Text>
+                                <Text style={styles.buttonText}>Create Account</Text>
                                 <Ionicons name="arrow-forward" size={20} color="#fff" />
                             </LinearGradient>
                         </TouchableOpacity>
 
-                        <View style={styles.divider}>
-                            <View style={styles.dividerLine} />
-                            <Text style={styles.dividerText}>OR</Text>
-                            <View style={styles.dividerLine} />
-                        </View>
-
                         <TouchableOpacity
-                            style={styles.googleButton}
-                            onPress={() => promptAsync()}
-                            disabled={!request}
+                            style={styles.loginLink}
+                            onPress={() => navigation.goBack()}
                         >
-                            <View style={styles.googleButtonContent}>
-                                <Ionicons name="logo-google" size={24} color="#DB4437" />
-                                <Text style={styles.googleButtonText}>Continue with Google</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.registerLink}
-                            onPress={() => navigation.navigate('Register')}
-                        >
-                            <Text style={styles.registerLinkText}>
-                                Don't have an account? <Text style={styles.registerLinkBold}>Sign Up</Text>
+                            <Text style={styles.loginLinkText}>
+                                Already have an account? <Text style={styles.loginLinkBold}>Login</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-            </KeyboardAvoidingView>
+            </ScrollView>
         </LinearGradient>
     );
 };
@@ -138,23 +118,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    keyboardView: {
-        flex: 1,
+    scrollContent: {
+        flexGrow: 1,
     },
     content: {
         flex: 1,
         justifyContent: 'center',
         padding: 20,
+        paddingTop: 60,
     },
     logoContainer: {
         alignItems: 'center',
-        marginBottom: 48,
+        marginBottom: 32,
     },
     appName: {
-        fontSize: 36,
+        fontSize: 32,
         fontWeight: 'bold',
         color: '#fff',
-        marginTop: 16,
+        marginTop: 12,
     },
     tagline: {
         fontSize: 14,
@@ -224,54 +205,15 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    divider: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 24,
-    },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#e0e0e0',
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: '#999',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    googleButton: {
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 12,
-        backgroundColor: '#fff',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    googleButtonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-        gap: 12,
-    },
-    googleButtonText: {
-        color: '#333',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    registerLink: {
+    loginLink: {
         marginTop: 20,
         alignItems: 'center',
     },
-    registerLinkText: {
+    loginLinkText: {
         fontSize: 14,
         color: '#666',
     },
-    registerLinkBold: {
+    loginLinkBold: {
         color: '#FF6B35',
         fontWeight: 'bold',
     },
