@@ -102,7 +102,11 @@ export const AddressManagementScreen = ({ navigation }) => {
                     <Text style={styles.headerTitle}>{editingId ? 'Edit Address' : 'Add New Address'}</Text>
                 </LinearGradient>
 
-                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    style={styles.formScroll}
+                    contentContainerStyle={styles.formScrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
                     <View style={styles.typeSelector}>
                         {ADDRESS_TYPES.map((item) => (
                             <TouchableOpacity
@@ -202,17 +206,19 @@ export const AddressManagementScreen = ({ navigation }) => {
                                 />
                             </View>
                         </View>
-
-                        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                            <LinearGradient
-                                colors={['#4CAF50', '#45a049']}
-                                style={styles.saveGradient}
-                            >
-                                <Text style={styles.saveText}>Save Address</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
                     </View>
                 </ScrollView>
+
+                <View style={styles.stickyFooter}>
+                    <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                        <LinearGradient
+                            colors={['#4CAF50', '#45a049']}
+                            style={styles.saveGradient}
+                        >
+                            <Text style={styles.saveText}>Save Address</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
@@ -307,20 +313,30 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         paddingTop: 60,
+        paddingBottom: 24,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
     },
     backButton: {
         marginRight: 16,
+        padding: 4,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
+        flex: 1,
     },
     content: {
         flex: 1,
         padding: 20,
+    },
+    formScroll: {
+        flex: 1,
+    },
+    formScrollContent: {
+        padding: 20,
+        paddingBottom: 100,
     },
     typeSelector: {
         flexDirection: 'row',
@@ -379,9 +395,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     saveButton: {
-        marginTop: 16,
         borderRadius: 12,
         overflow: 'hidden',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
     },
     saveGradient: {
         padding: 18,
@@ -391,6 +411,17 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    stickyFooter: {
+        padding: 20,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     addressCard: {
         backgroundColor: '#fff',

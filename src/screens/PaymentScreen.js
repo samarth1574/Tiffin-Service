@@ -176,16 +176,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         paddingTop: 60,
+        paddingBottom: 24,
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
     },
     backButton: {
         marginRight: 16,
+        padding: 4,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
+        flex: 1,
     },
     content: {
         flex: 1,

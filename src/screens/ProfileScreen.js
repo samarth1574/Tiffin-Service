@@ -65,7 +65,7 @@ export const ProfileScreen = ({ navigation }) => {
             icon: 'receipt',
             title: 'Order History',
             subtitle: 'View past orders',
-            onPress: () => Alert.alert('Coming Soon', 'Order history feature will be available soon'),
+            onPress: () => navigation.navigate('OrderHistory'),
             color: '#2196F3',
         },
         {

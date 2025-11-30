@@ -16,6 +16,7 @@ import { MenuDetailScreen } from '../screens/MenuDetailScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { AddressManagementScreen } from '../screens/AddressManagementScreen';
 import { PaymentScreen } from '../screens/PaymentScreen';
+import { OrderHistoryScreen } from '../screens/OrderHistoryScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -85,6 +86,11 @@ export const AppNavigator = () => {
                 <Stack.Screen
                     name="Payment"
                     component={PaymentScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="OrderHistory"
+                    component={OrderHistoryScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
