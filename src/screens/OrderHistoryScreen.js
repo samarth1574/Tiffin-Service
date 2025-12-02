@@ -98,7 +98,7 @@ export const OrderHistoryScreen = ({ navigation }) => {
                             onPress={() => {
                                 Alert.alert('Reorder', 'Would you like to reorder this plan?', [
                                     { text: 'Cancel', style: 'cancel' },
-                                    { text: 'Reorder', onPress: () => navigation.navigate('Subscription') },
+                                    { text: 'Reorder', onPress: () => navigation.navigate('Main', { screen: 'Subscription' }) },
                                 ]);
                             }}
                         >

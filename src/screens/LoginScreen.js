@@ -10,8 +10,10 @@ import { useEffect } from 'react';
 WebBrowser.maybeCompleteAuthSession();
 
 export const LoginScreen = ({ navigation }) => {
+    const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' or 'email'
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const { login } = useApp();
 
     const [request, response, promptAsync] = Google.useAuthRequest({
@@ -24,24 +26,29 @@ export const LoginScreen = ({ navigation }) => {
     useEffect(() => {
         if (response?.type === 'success') {
             const { authentication } = response;
-            // Handle successful Google login
             handleGoogleLogin(authentication);
         }
     }, [response]);
 
     const handleGoogleLogin = async (authentication) => {
-        // In a real app, you would verify the token with your backend
-        // For now, we'll just use dummy data
         await login('google-user', 'user@gmail.com');
         navigation.replace('Main');
     };
 
     const handleLogin = async () => {
-        if (!phone || !email) {
-            Alert.alert('Error', 'Please enter both phone and email');
-            return;
+        if (loginMethod === 'phone') {
+            if (!phone) {
+                Alert.alert('Error', 'Please enter your phone number');
+                return;
+            }
+            await login(phone, `${phone}@hometiffin.com`);
+        } else {
+            if (!email || !password) {
+                Alert.alert('Error', 'Please enter both email and password');
+                return;
+            }
+            await login(email, email);
         }
-        await login(phone, email);
         navigation.replace('Main');
     };
 
@@ -65,30 +72,88 @@ export const LoginScreen = ({ navigation }) => {
                         <Text style={styles.title}>Welcome Back!</Text>
                         <Text style={styles.subtitle}>Login to continue</Text>
 
-                        <View style={styles.inputContainer}>
-                            <Ionicons name="call-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Phone Number"
-                                placeholderTextColor="#999"
-                                keyboardType="phone-pad"
-                                value={phone}
-                                onChangeText={setPhone}
-                            />
+                        <View style={styles.methodSelector}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.methodButton,
+                                    loginMethod === 'phone' && styles.methodButtonActive
+                                ]}
+                                onPress={() => setLoginMethod('phone')}
+                            >
+                                <Ionicons
+                                    name="call"
+                                    size={20}
+                                    color={loginMethod === 'phone' ? '#fff' : '#666'}
+                                />
+                                <Text style={[
+                                    styles.methodText,
+                                    loginMethod === 'phone' && styles.methodTextActive
+                                ]}>
+                                    Phone
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.methodButton,
+                                    loginMethod === 'email' && styles.methodButtonActive
+                                ]}
+                                onPress={() => setLoginMethod('email')}
+                            >
+                                <Ionicons
+                                    name="mail"
+                                    size={20}
+                                    color={loginMethod === 'email' ? '#fff' : '#666'}
+                                />
+                                <Text style={[
+                                    styles.methodText,
+                                    loginMethod === 'email' && styles.methodTextActive
+                                ]}>
+                                    Email
+                                </Text>
+                            </TouchableOpacity>
                         </View>
 
-                        <View style={styles.inputContainer}>
-                            <Ionicons name="mail-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Email Address"
-                                placeholderTextColor="#999"
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                        </View>
+                        {loginMethod === 'phone' ? (
+                            <View style={styles.inputContainer}>
+                                <Ionicons name="call-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Phone Number"
+                                    placeholderTextColor="#999"
+                                    keyboardType="phone-pad"
+                                    value={phone}
+                                    onChangeText={setPhone}
+                                />
+                            </View>
+                        ) : (
+                            <>
+                                <View style={styles.inputContainer}>
+                                    <Ionicons name="mail-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Email Address"
+                                        placeholderTextColor="#999"
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                    />
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <Ionicons name="lock-closed-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Password"
+                                        placeholderTextColor="#999"
+                                        secureTextEntry
+                                        value={password}
+                                        onChangeText={setPassword}
+                                    />
+                                </View>
+                            </>
+                        )}
 
                         <TouchableOpacity style={styles.button} onPress={handleLogin}>
                             <LinearGradient
@@ -182,6 +247,35 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#666',
         marginBottom: 24,
+    },
+    methodSelector: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 24,
+    },
+    methodButton: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 14,
+        borderRadius: 12,
+        backgroundColor: '#f8f9fa',
+        borderWidth: 2,
+        borderColor: '#e0e0e0',
+        gap: 8,
+    },
+    methodButtonActive: {
+        backgroundColor: '#FF6B35',
+        borderColor: '#FF6B35',
+    },
+    methodText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#666',
+    },
+    methodTextActive: {
+        color: '#fff',
     },
     inputContainer: {
         flexDirection: 'row',

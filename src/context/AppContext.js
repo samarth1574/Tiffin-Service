@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendPauseConfirmation, sendResumeConfirmation } from '../utils/notifications';
 
 const AppContext = createContext(undefined);
 
@@ -131,11 +132,13 @@ export const AppProvider = ({ children }) => {
   const pauseSubscription = async () => {
     setSubscriptionStatus('paused');
     await AsyncStorage.setItem(STORAGE_KEYS.SUBSCRIPTION_STATUS, 'paused');
+    await sendPauseConfirmation();
   };
 
   const resumeSubscription = async () => {
     setSubscriptionStatus('active');
     await AsyncStorage.setItem(STORAGE_KEYS.SUBSCRIPTION_STATUS, 'active');
+    await sendResumeConfirmation();
   };
 
   return (

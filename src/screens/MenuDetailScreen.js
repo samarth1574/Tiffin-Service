@@ -92,7 +92,7 @@ export const MenuDetailScreen = ({ navigation }) => {
 
                             <TouchableOpacity
                                 style={styles.subscribeButton}
-                                onPress={() => navigation.navigate('Subscription')}
+                                onPress={() => navigation.navigate('Main', { screen: 'Subscription' })}
                             >
                                 <LinearGradient
                                     colors={['#4CAF50', '#45a049']}
