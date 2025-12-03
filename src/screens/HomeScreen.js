@@ -28,13 +28,42 @@ export const HomeScreen = ({ navigation }) => {
                         <Text style={styles.greeting}>Hello, {user?.name || 'Guest'}!</Text>
                         <Text style={styles.subtitle}>What would you like to eat today?</Text>
                     </View>
-                    <TouchableOpacity style={styles.notificationButton}>
+                    <TouchableOpacity
+                        style={styles.notificationButton}
+                        onPress={() => navigation.navigate('Notifications')}
+                    >
                         <Ionicons name="notifications-outline" size={24} color="#fff" />
                     </TouchableOpacity>
                 </View>
             </LinearGradient>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Value Proposition */}
+                <View style={styles.valueSection}>
+                    <Text style={styles.valueSectionTitle}>Why Choose HomeTiffin?</Text>
+                    <View style={styles.valueGrid}>
+                        <View style={styles.valueCard}>
+                            <Ionicons name="shield-checkmark" size={32} color="#4CAF50" />
+                            <Text style={styles.valueTitle}>100% Hygienic</Text>
+                            <Text style={styles.valueText}>FSSAI Certified</Text>
+                        </View>
+                        <View style={styles.valueCard}>
+                            <Ionicons name="home" size={32} color="#FF6B35" />
+                            <Text style={styles.valueTitle}>Home-Style</Text>
+                            <Text style={styles.valueText}>Authentic taste</Text>
+                        </View>
+                        <View style={styles.valueCard}>
+                            <Ionicons name="cash-outline" size={32} color="#2196F3" />
+                            <Text style={styles.valueTitle}>Affordable</Text>
+                            <Text style={styles.valueText}>From ₹150/day</Text>
+                        </View>
+                        <View style={styles.valueCard}>
+                            <Ionicons name="time-outline" size={32} color="#9C27B0" />
+                            <Text style={styles.valueTitle}>On-Time</Text>
+                            <Text style={styles.valueText}>Real-time tracking</Text>
+                        </View>
+                    </View>
+                </View>
                 {subscriptionPlan && (
                     <View style={styles.statusBanner}>
                         <LinearGradient
@@ -182,6 +211,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
     },
+    sectionHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    viewAllText: {
+        fontSize: 16,
+        color: '#FF6B35',
+        fontWeight: '600',
+    },
     mealDetails: {
         backgroundColor: '#fff',
         borderRadius: 16,
@@ -229,5 +269,43 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    valueSection: {
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        backgroundColor: '#fff',
+    },
+    valueSectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 16,
+    },
+    valueGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    valueCard: {
+        width: '48%',
+        backgroundColor: '#f8f9fa',
+        borderRadius: 12,
+        padding: 12,
+        alignItems: 'center',
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+    },
+    valueTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+        marginTop: 6,
+        marginBottom: 2,
+    },
+    valueText: {
+        fontSize: 11,
+        color: '#666',
+        textAlign: 'center',
     },
 });

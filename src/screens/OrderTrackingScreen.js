@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Image, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -12,8 +12,7 @@ const STEPS = [
 ];
 
 export const OrderTrackingScreen = ({ navigation }) => {
-    const { mealPreference } = useApp();
-    const [currentStep, setCurrentStep] = useState(2); // Simulating "Out for Delivery"
+    const { activeOrder } = useApp();
     const [pulseAnim] = useState(new Animated.Value(1));
 
     useEffect(() => {
@@ -32,29 +31,38 @@ export const OrderTrackingScreen = ({ navigation }) => {
                 }),
             ])
         ).start();
-
-        // Simulate real-time updates (for demo purposes)
-        const interval = setInterval(() => {
-            setCurrentStep((prev) => {
-                if (prev < STEPS.length - 1) {
-                    return prev + 1;
-                }
-                return prev;
-            });
-        }, 10000); // Update every 10 seconds
-
-        return () => clearInterval(interval);
     }, []);
+
+    if (!activeOrder) {
+        return (
+            <View style={styles.container}>
+                <LinearGradient
+                    colors={['#FF6B35', '#F7931E']}
+                    style={styles.header}
+                >
+                    <Ionicons name="location" size={40} color="#fff" />
+                    <Text style={styles.headerTitle}>Track Your Order</Text>
+                </LinearGradient>
+                <View style={styles.emptyState}>
+                    <Ionicons name="fast-food-outline" size={80} color="#ccc" />
+                    <Text style={styles.emptyText}>No active orders</Text>
+                    <TouchableOpacity
+                        style={styles.orderButton}
+                        onPress={() => navigation.navigate('Subscription')}
+                    >
+                        <Text style={styles.orderButtonText}>Place an Order</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
+
+    const currentStep = activeOrder.status;
 
     const getStepStatus = (index) => {
         if (index < currentStep) return 'completed';
         if (index === currentStep) return 'active';
         return 'pending';
-    };
-
-    const getEstimatedTime = () => {
-        const times = ['10:00 AM', '10:30 AM', '11:45 AM', '12:30 PM'];
-        return times[currentStep] || '12:30 PM';
     };
 
     return (
@@ -66,8 +74,9 @@ export const OrderTrackingScreen = ({ navigation }) => {
                 <Ionicons name="location" size={40} color="#fff" />
                 <Text style={styles.headerTitle}>Track Your Order</Text>
                 <Text style={styles.headerSubtitle}>
-                    {mealPreference?.time} - {mealPreference?.type} Meal
+                    {activeOrder.mealTime} - {activeOrder.mealType} Meal
                 </Text>
+                <Text style={styles.orderId}>Order ID: #{activeOrder.id.slice(-6)}</Text>
             </LinearGradient>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -81,7 +90,7 @@ export const OrderTrackingScreen = ({ navigation }) => {
                             <Text style={styles.estimateLabel}>
                                 {currentStep === STEPS.length - 1 ? 'Delivered At' : 'Estimated Delivery'}
                             </Text>
-                            <Text style={styles.estimateTime}>{getEstimatedTime()}</Text>
+                            <Text style={styles.estimateTime}>{activeOrder.estimatedTime}</Text>
                         </View>
                     </LinearGradient>
                 </View>
@@ -96,7 +105,8 @@ export const OrderTrackingScreen = ({ navigation }) => {
                                         styles.time,
                                         status !== 'pending' && styles.activeTime
                                     ]}>
-                                        {['10:00 AM', '10:30 AM', '11:45 AM', '12:30 PM'][index]}
+                                        {/* In a real app, these times would be dynamic based on status updates */}
+                                        {status !== 'pending' ? 'Done' : '--:--'}
                                     </Text>
                                 </View>
 
@@ -163,10 +173,17 @@ export const OrderTrackingScreen = ({ navigation }) => {
                         <Ionicons name="person" size={24} color="#FF6B35" />
                         <View style={styles.infoContent}>
                             <Text style={styles.infoLabel}>Delivery Partner</Text>
-                            <Text style={styles.infoValue}>Rahul Kumar</Text>
-                            <Text style={styles.infoSubtext}>⭐ 4.8 (250+ deliveries)</Text>
+                            <Text style={styles.infoValue}>{activeOrder.deliveryPartner?.name}</Text>
+                            <Text style={styles.infoSubtext}>⭐ {activeOrder.deliveryPartner?.rating} (250+ deliveries)</Text>
                         </View>
-                        <TouchableOpacity style={styles.callButton}>
+                        <TouchableOpacity
+                            style={styles.callButton}
+                            onPress={() => {
+                                if (activeOrder.deliveryPartner?.phone) {
+                                    Linking.openURL(`tel:${activeOrder.deliveryPartner.phone}`);
+                                }
+                            }}
+                        >
                             <Ionicons name="call" size={20} color="#4CAF50" />
                         </TouchableOpacity>
                     </View>
@@ -175,8 +192,10 @@ export const OrderTrackingScreen = ({ navigation }) => {
                         <Ionicons name="location" size={24} color="#FF6B35" />
                         <View style={styles.infoContent}>
                             <Text style={styles.infoLabel}>Delivery Address</Text>
-                            <Text style={styles.infoValue}>Home</Text>
-                            <Text style={styles.infoSubtext}>123 Main St, Apartment 4B</Text>
+                            <Text style={styles.infoValue}>{activeOrder.address?.type || 'Home'}</Text>
+                            <Text style={styles.infoSubtext}>
+                                {activeOrder.address?.addressLine1}, {activeOrder.address?.city}
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -184,7 +203,7 @@ export const OrderTrackingScreen = ({ navigation }) => {
                 {currentStep === STEPS.length - 1 && (
                     <TouchableOpacity
                         style={styles.feedbackButton}
-                        onPress={() => navigation.navigate('Feedback', { orderId: '12345' })}
+                        onPress={() => navigation.navigate('Feedback', { orderId: activeOrder.id })}
                     >
                         <LinearGradient
                             colors={['#4CAF50', '#45a049']}
@@ -442,5 +461,39 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    emptyState: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        marginTop: 100,
+    },
+    emptyText: {
+        fontSize: 18,
+        color: '#666',
+        marginTop: 16,
+        marginBottom: 24,
+    },
+    orderButton: {
+        backgroundColor: '#FF6B35',
+        paddingHorizontal: 32,
+        paddingVertical: 16,
+        borderRadius: 12,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    orderButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    orderId: {
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: 12,
+        marginTop: 8,
     },
 });

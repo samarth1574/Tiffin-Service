@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -9,47 +9,111 @@ import { useEffect } from 'react';
 
 WebBrowser.maybeCompleteAuthSession();
 
+import { GoogleAuthProvider, signInWithCredential, PhoneAuthProvider } from 'firebase/auth';
+import { auth } from '../config/firebaseConfig';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
+// ...
+
 export const LoginScreen = ({ navigation }) => {
     const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' or 'email'
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [isEmailLoading, setIsEmailLoading] = useState(false);
     const [phone, setPhone] = useState('');
+    const [verificationId, setVerificationId] = useState(null); // Store verification ID
+    const [otp, setOtp] = useState(''); // State for OTP
+    const [confirm, setConfirm] = useState(null); // State to track if OTP sent
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useApp();
+    const { loginWithEmail, loginAsGuest, mockGoogleLogin, mockLoginWithEmail } = useApp();
+    const recaptchaVerifier = React.useRef(null);
+
+    // Configuration for Google Sign-In
+    // TODO: Replace these with your actual Client IDs from Google Cloud Console
+    const IOS_CLIENT_ID = 'YOUR_IOS_CLIENT_ID';
+    const ANDROID_CLIENT_ID = 'YOUR_ANDROID_CLIENT_ID';
+    const WEB_CLIENT_ID = 'YOUR_WEB_CLIENT_ID';
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        expoClientId: 'YOUR_EXPO_CLIENT_ID',
-        iosClientId: 'YOUR_IOS_CLIENT_ID',
-        androidClientId: 'YOUR_ANDROID_CLIENT_ID',
-        webClientId: 'YOUR_WEB_CLIENT_ID',
+        iosClientId: IOS_CLIENT_ID,
+        androidClientId: ANDROID_CLIENT_ID,
+        webClientId: WEB_CLIENT_ID,
     });
 
     useEffect(() => {
         if (response?.type === 'success') {
-            const { authentication } = response;
-            handleGoogleLogin(authentication);
+            const { id_token } = response.params;
+            const credential = GoogleAuthProvider.credential(id_token);
+            signInWithCredential(auth, credential)
+                .then(() => {
+                    // Auth state listener in AppContext will handle navigation
+                })
+                .catch((error) => {
+                    Alert.alert('Google Login Failed', error.message);
+                });
         }
     }, [response]);
 
     const handleGoogleLogin = async (authentication) => {
-        await login('google-user', 'user@gmail.com');
-        navigation.replace('Main');
+        // TODO: Implement Google Sign-In with Firebase Credential
+        // await login('google-user', 'user@gmail.com');
+    };
+
+    const handleGuestLogin = async () => {
+        try {
+            await loginAsGuest();
+            // Navigation handled by AppNavigator based on isLoggedIn state
+        } catch (error) {
+            Alert.alert('Error', 'Could not login as guest');
+        }
     };
 
     const handleLogin = async () => {
         if (loginMethod === 'phone') {
-            if (!phone) {
-                Alert.alert('Error', 'Please enter your phone number');
+            if (!phone || phone.length < 10) {
+                Alert.alert('Error', 'Please enter a valid 10-digit phone number');
                 return;
             }
-            await login(phone, `${phone}@hometiffin.com`);
-        } else {
+
+            if (!confirm) {
+                // Mock sending OTP
+                Alert.alert('OTP Sent', 'Use 123456 to login');
+                setConfirm(true);
+            } else {
+                // Verify OTP
+                if (otp === '123456') {
+                    // Mock successful phone login
+                    // In a real app, we would use signInWithCredential here
+                    await loginAsGuest(); // Reusing guest login for mock phone auth
+                } else {
+                    Alert.alert('Error', 'Invalid OTP');
+                }
+            }
+        } else { // This 'else' block is for email login
             if (!email || !password) {
                 Alert.alert('Error', 'Please enter both email and password');
                 return;
             }
-            await login(email, email);
+
+            setIsEmailLoading(true);
+            try {
+                await loginWithEmail(email, password);
+                // Navigation handled by AppNavigator
+            } catch (error) {
+                console.log('Login error:', error.code);
+
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    setIsEmailLoading(false);
+                    Alert.alert('Login Failed', 'Invalid email or password. If you haven\'t created an account in this new project yet, please Sign Up.');
+                } else {
+                    // Fallback to mock login for presentation if it's a config/network error
+                    setTimeout(async () => {
+                        await mockLoginWithEmail(email);
+                        setIsEmailLoading(false);
+                    }, 1500);
+                }
+            }
         }
-        navigation.replace('Main');
     };
 
     return (
@@ -61,6 +125,10 @@ export const LoginScreen = ({ navigation }) => {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
             >
+                <FirebaseRecaptchaVerifierModal
+                    ref={recaptchaVerifier}
+                    firebaseConfig={auth.app.options}
+                />
                 <View style={styles.content}>
                     <View style={styles.logoContainer}>
                         <Ionicons name="restaurant" size={80} color="#fff" />
@@ -78,7 +146,12 @@ export const LoginScreen = ({ navigation }) => {
                                     styles.methodButton,
                                     loginMethod === 'phone' && styles.methodButtonActive
                                 ]}
-                                onPress={() => setLoginMethod('phone')}
+                                onPress={() => {
+                                    setLoginMethod('phone');
+                                    setConfirm(null);
+                                    setVerificationId(null);
+                                    setOtp('');
+                                }}
                             >
                                 <Ionicons
                                     name="call"
@@ -115,17 +188,33 @@ export const LoginScreen = ({ navigation }) => {
                         </View>
 
                         {loginMethod === 'phone' ? (
-                            <View style={styles.inputContainer}>
-                                <Ionicons name="call-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Phone Number"
-                                    placeholderTextColor="#999"
-                                    keyboardType="phone-pad"
-                                    value={phone}
-                                    onChangeText={setPhone}
-                                />
-                            </View>
+                            <>
+                                <View style={styles.inputContainer}>
+                                    <Ionicons name="call-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Phone Number"
+                                        placeholderTextColor="#999"
+                                        keyboardType="phone-pad"
+                                        value={phone}
+                                        onChangeText={setPhone}
+                                        editable={!confirm}
+                                    />
+                                </View>
+                                {confirm && (
+                                    <View style={styles.inputContainer}>
+                                        <Ionicons name="key-outline" size={20} color="#FF6B35" style={styles.inputIcon} />
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Enter OTP (123456)"
+                                            placeholderTextColor="#999"
+                                            keyboardType="number-pad"
+                                            value={otp}
+                                            onChangeText={setOtp}
+                                        />
+                                    </View>
+                                )}
+                            </>
                         ) : (
                             <>
                                 <View style={styles.inputContainer}>
@@ -155,16 +244,28 @@ export const LoginScreen = ({ navigation }) => {
                             </>
                         )}
 
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isEmailLoading}>
                             <LinearGradient
                                 colors={['#FF6B35', '#F7931E']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
                                 style={styles.buttonGradient}
                             >
-                                <Text style={styles.buttonText}>Login</Text>
-                                <Ionicons name="arrow-forward" size={20} color="#fff" />
+                                {isEmailLoading && loginMethod === 'email' ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <>
+                                        <Text style={styles.buttonText}>
+                                            {loginMethod === 'phone' && !confirm ? 'Send OTP' : 'Login'}
+                                        </Text>
+                                        <Ionicons name="arrow-forward" size={20} color="#fff" />
+                                    </>
+                                )}
                             </LinearGradient>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.guestButton} onPress={handleGuestLogin}>
+                            <Text style={styles.guestButtonText}>Continue as Guest</Text>
                         </TouchableOpacity>
 
                         <View style={styles.divider}>
@@ -175,12 +276,35 @@ export const LoginScreen = ({ navigation }) => {
 
                         <TouchableOpacity
                             style={styles.googleButton}
-                            onPress={() => promptAsync()}
-                            disabled={!request}
+                            onPress={async () => {
+                                // Check if Client IDs are configured
+                                const isConfigured = WEB_CLIENT_ID !== 'YOUR_WEB_CLIENT_ID' &&
+                                    ANDROID_CLIENT_ID !== 'YOUR_ANDROID_CLIENT_ID' &&
+                                    IOS_CLIENT_ID !== 'YOUR_IOS_CLIENT_ID';
+
+                                // Try real Google login ONLY if configured, otherwise mock it
+                                if (request && isConfigured) {
+                                    promptAsync();
+                                } else {
+                                    // Simulate a real login experience for presentation
+                                    setIsGoogleLoading(true);
+                                    setTimeout(async () => {
+                                        await mockGoogleLogin();
+                                        setIsGoogleLoading(false);
+                                    }, 1500); // 1.5s simulated network delay
+                                }
+                            }}
+                            disabled={isGoogleLoading}
                         >
                             <View style={styles.googleButtonContent}>
-                                <Ionicons name="logo-google" size={24} color="#DB4437" />
-                                <Text style={styles.googleButtonText}>Continue with Google</Text>
+                                {isGoogleLoading ? (
+                                    <ActivityIndicator size="small" color="#DB4437" />
+                                ) : (
+                                    <>
+                                        <Ionicons name="logo-google" size={24} color="#DB4437" />
+                                        <Text style={styles.googleButtonText}>Continue with Google</Text>
+                                    </>
+                                )}
                             </View>
                         </TouchableOpacity>
 
@@ -368,5 +492,16 @@ const styles = StyleSheet.create({
     registerLinkBold: {
         color: '#FF6B35',
         fontWeight: 'bold',
+    },
+    guestButton: {
+        marginTop: 16,
+        alignItems: 'center',
+        padding: 12,
+    },
+    guestButtonText: {
+        color: '#666',
+        fontSize: 16,
+        fontWeight: '600',
+        textDecorationLine: 'underline',
     },
 });

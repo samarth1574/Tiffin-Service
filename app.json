@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "antigravity",
-    "slug": "antigravity",
+    "name": "Tiffin-Service",
+    "slug": "Tiffin-Service",
     "version": "1.0.0",
+    "scheme": "hometiffin",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

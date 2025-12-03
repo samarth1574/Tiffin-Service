@@ -73,9 +73,23 @@ export const SubscriptionScreen = ({ navigation }) => {
                                 <View style={styles.planInfo}>
                                     <Text style={styles.planName}>{plan.name} Plan</Text>
                                     <View style={styles.priceContainer}>
-                                        <Text style={styles.price}>{plan.price}</Text>
-                                        <Text style={styles.period}>{plan.period}</Text>
+                                        <Text style={styles.planPrice}>{plan.price}</Text>
+                                        <Text style={styles.planDuration}>{plan.period}</Text>
                                     </View>
+                                </View>
+                            </View>
+                            <View style={styles.featuresContainerInGradient}>
+                                <View style={styles.featureInGradient}>
+                                    <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                                    <Text style={styles.featureTextInGradient}>Fresh homemade food</Text>
+                                </View>
+                                <View style={styles.featureInGradient}>
+                                    <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                                    <Text style={styles.featureTextInGradient}>On-time delivery</Text>
+                                </View>
+                                <View style={styles.featureInGradient}>
+                                    <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                                    <Text style={styles.featureTextInGradient}>Hygienic packaging</Text>
                                 </View>
                             </View>
                         </LinearGradient>
@@ -181,13 +195,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
     },
-    period: {
+    planDuration: {
         fontSize: 14,
-        color: '#fff',
-        opacity: 0.9,
+        color: '#666',
+        marginBottom: 16,
     },
     featuresContainer: {
         padding: 20,
+        gap: 8,
+        marginBottom: 8,
     },
     feature: {
         flexDirection: 'row',
@@ -196,8 +212,22 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     featureText: {
-        fontSize: 16,
+        fontSize: 14,
         color: '#666',
+    },
+    featuresContainerInGradient: {
+        gap: 8,
+        marginTop: 12,
+    },
+    featureInGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    featureTextInGradient: {
+        fontSize: 14,
+        color: '#fff',
+        opacity: 0.9,
     },
     selectButton: {
         flexDirection: 'row',

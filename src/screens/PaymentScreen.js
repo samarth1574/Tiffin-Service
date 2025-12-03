@@ -34,24 +34,35 @@ const PAYMENT_METHODS = [
     },
 ];
 
+import { useApp } from '../context/AppContext';
+
 export const PaymentScreen = ({ route, navigation }) => {
     const { amount, plan } = route.params || { amount: 0, plan: 'Daily' };
+    const { placeOrder, mealPreference, selectedAddress } = useApp();
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
         if (!selectedMethod) {
             Alert.alert('Error', 'Please select a payment method');
             return;
         }
 
         // Simulate payment processing
+        await placeOrder({
+            amount,
+            plan,
+            mealType: mealPreference?.type,
+            mealTime: mealPreference?.time,
+            address: selectedAddress
+        });
+
         Alert.alert(
             'Payment Successful!',
             `Your ${plan} subscription has been activated.\nAmount Paid: ₹${amount}`,
             [
                 {
-                    text: 'OK',
+                    text: 'Track Order',
                     onPress: () => navigation.navigate('OrderTracking'),
                 },
             ]

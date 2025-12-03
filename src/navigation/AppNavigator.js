@@ -18,6 +18,8 @@ import { AddressManagementScreen } from '../screens/AddressManagementScreen';
 import { PaymentScreen } from '../screens/PaymentScreen';
 import { OrderHistoryScreen } from '../screens/OrderHistoryScreen';
 import { FeedbackScreen } from '../screens/FeedbackScreen';
+import { NotificationScreen } from '../screens/NotificationScreen';
+import { useApp } from '../context/AppContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,48 +50,65 @@ const MainTabs = () => {
 };
 
 export const AppNavigator = () => {
+    const { isLoggedIn, isLoading } = useApp();
+
+    if (isLoading) {
+        return <SplashScreen />;
+    }
+
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Splash" component={SplashScreen} />
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Register" component={RegisterScreen} />
-                <Stack.Screen name="Main" component={MainTabs} />
-                <Stack.Screen
-                    name="MenuDetail"
-                    component={MenuDetailScreen}
-                    options={{ headerShown: true, title: 'Menu Details' }}
-                />
-                <Stack.Screen
-                    name="MealPreference"
-                    component={MealPreferenceScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Checkout"
-                    component={CheckoutScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="AddressManagement"
-                    component={AddressManagementScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Payment"
-                    component={PaymentScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="OrderHistory"
-                    component={OrderHistoryScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Feedback"
-                    component={FeedbackScreen}
-                    options={{ headerShown: false }}
-                />
+                {isLoggedIn ? (
+                    <>
+                        <Stack.Screen name="Main" component={MainTabs} />
+                        <Stack.Screen
+                            name="MenuDetail"
+                            component={MenuDetailScreen}
+                            options={{ headerShown: true, title: 'Menu Details' }}
+                        />
+                        <Stack.Screen
+                            name="MealPreference"
+                            component={MealPreferenceScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Checkout"
+                            component={CheckoutScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="AddressManagement"
+                            component={AddressManagementScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Payment"
+                            component={PaymentScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="OrderHistory"
+                            component={OrderHistoryScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Feedback"
+                            component={FeedbackScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Notifications"
+                            component={NotificationScreen}
+                            options={{ headerShown: false }}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <Stack.Screen name="Login" component={LoginScreen} />
+                        <Stack.Screen name="Register" component={RegisterScreen} />
+                    </>
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     );
