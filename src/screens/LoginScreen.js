@@ -76,15 +76,12 @@ export const LoginScreen = ({ navigation }) => {
             }
 
             if (!confirm) {
-                // Mock sending OTP
                 Alert.alert('OTP Sent', 'Use 123456 to login');
                 setConfirm(true);
             } else {
                 // Verify OTP
                 if (otp === '123456') {
-                    // Mock successful phone login
-                    // In a real app, we would use signInWithCredential here
-                    await loginAsGuest(); // Reusing guest login for mock phone auth
+                    await loginAsGuest();
                 } else {
                     Alert.alert('Error', 'Invalid OTP');
                 }
@@ -106,7 +103,6 @@ export const LoginScreen = ({ navigation }) => {
                     setIsEmailLoading(false);
                     Alert.alert('Login Failed', 'Invalid email or password. If you haven\'t created an account in this new project yet, please Sign Up.');
                 } else {
-                    // Fallback to mock login for presentation if it's a config/network error
                     setTimeout(async () => {
                         await mockLoginWithEmail(email);
                         setIsEmailLoading(false);
@@ -282,16 +278,15 @@ export const LoginScreen = ({ navigation }) => {
                                     ANDROID_CLIENT_ID !== 'YOUR_ANDROID_CLIENT_ID' &&
                                     IOS_CLIENT_ID !== 'YOUR_IOS_CLIENT_ID';
 
-                                // Try real Google login ONLY if configured, otherwise mock it
+                                // Try real Google login ONLY if configured, otherwise simulate it
                                 if (request && isConfigured) {
                                     promptAsync();
                                 } else {
-                                    // Simulate a real login experience for presentation
                                     setIsGoogleLoading(true);
                                     setTimeout(async () => {
                                         await mockGoogleLogin();
                                         setIsGoogleLoading(false);
-                                    }, 1500); // 1.5s simulated network delay
+                                    }, 1500);
                                 }
                             }}
                             disabled={isGoogleLoading}

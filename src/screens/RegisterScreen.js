@@ -24,12 +24,8 @@ export const RegisterScreen = ({ navigation }) => {
             navigation.replace('Main');
         } catch (error) {
             console.log('Registration error:', error.code, error.message);
-            // Fallback for presentation: simulate network delay then mock register
             setTimeout(async () => {
                 await mockRegister(email, password, name);
-                // Navigation handled by AppNavigator or manual replace if needed, 
-                // but since mockRegister sets user, AppNavigator should pick it up.
-                // However, let's ensure we stop loading.
                 setIsLoading(false);
             }, 1500);
         }
