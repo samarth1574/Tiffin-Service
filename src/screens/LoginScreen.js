@@ -83,7 +83,24 @@ export const LoginScreen = ({ navigation }) => {
                 if (otp === '123456') {
                     await loginAsGuest();
                 } else {
-                    Alert.alert('Error', 'Invalid OTP');
+                    try {
+                        const credential = PhoneAuthProvider.credential(
+                            verificationId,
+                            otp
+                        );
+                        const userCredential = await signInWithCredential(auth, credential);
+
+                        // Check if user is new
+                        if (userCredential._tokenResponse?.isNewUser) {
+                            // Delete the new user since this is Login screen
+                            await userCredential.user.delete();
+                            Alert.alert('Login Failed', 'Account does not exist. Please Sign Up first.');
+                        }
+                        // If not new, AppContext onAuthStateChanged will handle navigation
+                    } catch (error) {
+                        console.log('OTP Error:', error);
+                        Alert.alert('Error', 'Invalid OTP or Login Failed');
+                    }
                 }
             }
         } else { // This 'else' block is for email login
